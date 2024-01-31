@@ -50,8 +50,8 @@ tree = app_commands.CommandTree(client)
 )
 async def serverstats(interaction):
     data = load_data()
-    category_to_delete = interaction.client.get_channel(int(data['service_stats_category']))
-    if category_to_delete:
+    if data['service_stats_category'] is not None:
+        category_to_delete = interaction.client.get_channel(int(data['service_stats_category']))
         await delete_category_and_channels(category_to_delete)
     guild = interaction.client.get_guild(int(GUILD_ID))
     category = await create_category(guild, '📊 SERVER STATS 📊', 0)
