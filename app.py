@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 import os
 from flask import Flask
+from threading import Thread
 from functions.send_welcome_message import send_welcome_message
 from functions.create_category import create_category
 from functions.create_locked_channel import create_locked_channel
@@ -23,6 +24,11 @@ def run():
     app.run(host='0.0.0.0', port=10000)
 
 
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+
 # ENV VARIABLES
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
@@ -42,11 +48,12 @@ tree = app_commands.CommandTree(client)
     description="This command will create a server status category with status data.",
     guild=discord.Object(id=int(GUILD_ID))
 )
-async def serverstats():
+async def serverstats(interaction):
     data = load_data()
-    category_to_delete = client.get_channel(int(data['service_stats_category']))
-    await delete_category_and_channels(category_to_delete)
-    guild = client.get_guild(int(GUILD_ID))
+    category_to_delete = interaction.client.get_channel(int(data['service_stats_category']))
+    if category_to_delete:
+        await delete_category_and_channels(category_to_delete)
+    guild = interaction.client.get_guild(int(GUILD_ID))
     category = await create_category(guild, '📊 SERVER STATS 📊', 0)
     data['server_stats_category'] = category.id
     save_data(data)
@@ -70,5 +77,5 @@ async def on_member_join(member):
 
 
 # FLASK & BOT START
-run()
+keep_alive()
 client.run(BOT_TOKEN)
