@@ -47,8 +47,7 @@ async def my_schedule():
 # ON READY EVENT
 @client.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
-    await create_server_stats(GUILD_ID, client)
+    print('Ready!')
 
 
 # ON MEMBER JOIN EVENT
