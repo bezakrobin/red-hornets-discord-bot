@@ -3,7 +3,7 @@ from discord import app_commands
 import os
 from flask import Flask
 
-app = Flask('')
+app = Flask(__name__)
 
 
 @app.route('/')
@@ -13,6 +13,7 @@ def home():
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
+WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
