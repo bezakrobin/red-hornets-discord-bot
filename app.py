@@ -6,6 +6,8 @@ from functions.send_welcome_message import send_welcome_message
 from functions.create_category import create_category
 from functions.create_locked_channel import create_locked_channel
 from functions.load_data import load_data
+from functions.save_data import save_data
+from functions.delete_category_and_channels import delete_category_and_channels
 
 
 # FLASK WEB SERVER
@@ -42,8 +44,12 @@ tree = app_commands.CommandTree(client)
 )
 async def serverstats():
     data = load_data()
+    category_to_delete = client.get_channel(int(data['service_stats_category']))
+    await delete_category_and_channels(category_to_delete)
     guild = client.get_guild(int(GUILD_ID))
     category = await create_category(guild, '📊 SERVER STATS 📊', 0)
+    data['server_stats_category'] = category.id
+    save_data(data)
     await create_locked_channel(guild, f"MEMBERS: {data['member_count']}", 'voice', category)
     await create_locked_channel(guild, f"SUGGESTIONS: {data['suggestions_count']}", 'voice', category)
     await create_locked_channel(guild, f"SUGGESTIONS DONE: {data['suggestions_done_count']}", 'voice', category)
