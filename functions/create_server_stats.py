@@ -7,7 +7,7 @@ from save_data import save_data
 
 async def create_server_stats(guild_id, client):
     data = load_data()
-    if data['service_stats_category'] is not 0:
+    if data['service_stats_category'] != 0:
         category_to_delete = client.get_channel(int(data['service_stats_category']))
         await delete_category_and_channels(category_to_delete)
     guild = client.get_guild(int(guild_id))
