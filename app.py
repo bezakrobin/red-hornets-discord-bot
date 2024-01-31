@@ -94,16 +94,26 @@ async def send_welcome_message(member):
         await welcome_channel.send(embed=embed)
 
 
+# CREATE SERVER STATS
 async def create_server_stats():
+    data = load_data()
     guild = client.get_guild(int(GUILD_ID))
-    await create_category(guild, 'SERVER STATS', 1)
+    category = await create_category(guild, 'SERVER STATS', 1)
+    await create_channel(guild, f"MEMBERS: {data['member_count']}", 'text', category)
 
 
-# This creates a new category at the specified position
+# CREATE CATEGORY
 async def create_category(guild, category_name: str, position: int):
     new_category = await guild.create_category(name=category_name, position=position)
     return new_category
 
 
-async def create_channel():
-    pass
+# CREATE CHANNEL
+async def create_channel(guild, channel_name: str, channel_type: str, category: discord.CategoryChannel = None):
+    if channel_type == 'text':
+        new_channel = await guild.create_text_channel(name=channel_name, category=category)
+    elif channel_type == 'voice':
+        new_channel = await guild.create_voice_channel(name=channel_name, category=category)
+    else:
+        raise ValueError("Channel type must be 'text' or 'voice'")
+    return new_channel
