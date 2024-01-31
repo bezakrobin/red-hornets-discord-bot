@@ -2,7 +2,12 @@ import discord
 from discord import app_commands
 import os
 from flask import Flask
-from utils import create_server_stats, send_welcome_message
+from functions.send_welcome_message import send_welcome_message
+from functions.create_category import create_category
+from functions.create_locked_channel import create_locked_channel
+from functions.load_data import load_data
+from functions.save_data import save_data
+from functions.delete_category_and_channels import delete_category_and_channels
 
 
 # FLASK WEB SERVER
@@ -22,7 +27,7 @@ def run():
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
 WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
-SERVER_STATS_CATEGORY_ID = os.environ.get('SERVER_STATS_CATEGORY_ID')
+
 
 # BOT SETUP
 intents = discord.Intents.default()
@@ -31,11 +36,31 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
+# COMMANDS
+@tree.command(
+    name="serverstats",
+    description="This command will create a server status category with status data.",
+    guild=discord.Object(id=int(GUILD_ID))
+)
+async def serverstats():
+    data = load_data()
+    category_to_delete = client.get_channel(int(data['service_stats_category']))
+    await delete_category_and_channels(category_to_delete)
+    guild = client.get_guild(int(GUILD_ID))
+    category = await create_category(guild, '📊 SERVER STATS 📊', 0)
+    data['server_stats_category'] = category.id
+    save_data(data)
+    await create_locked_channel(guild, f"MEMBERS: {data['member_count']}", 'voice', category)
+    await create_locked_channel(guild, f"SUGGESTIONS: {data['suggestions_count']}", 'voice', category)
+    await create_locked_channel(guild, f"SUGGESTIONS DONE: {data['suggestions_done_count']}", 'voice', category)
+    await create_locked_channel(guild, f"BUGS: {data['bugs_count']}", 'voice', category)
+    await create_locked_channel(guild, f"BUGS FIXED: {data['bugs_fixed_count']}", 'voice', category)
+
+
 # ON READY EVENT
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
-    await create_server_stats(client, SERVER_STATS_CATEGORY_ID)
 
 
 # ON MEMBER JOIN EVENT
