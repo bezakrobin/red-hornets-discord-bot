@@ -93,3 +93,10 @@ async def send_welcome_message(member):
         )
         embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
         await welcome_channel.send(embed=embed)
+
+
+# UPDATE MEMBER COUNT
+def update_member_count():
+    data = load_data()
+    data['member_count'] = data.get('member_count', 0) + 1
+    save_data(data)
