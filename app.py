@@ -28,7 +28,6 @@ def keep_alive():
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
 WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
-SERVER_STATS_CATEGORY_ID = os.environ.get('SERVER_STATS_CATEGORY_ID')
 
 
 # BOT SETUP
@@ -42,7 +41,6 @@ tree = app_commands.CommandTree(client)
 @client.event
 async def on_member_join(member):
     await send_welcome_message(member)
-    update_member_count()
 
 
 # SLASH COMMANDS
@@ -96,29 +94,26 @@ async def send_welcome_message(member):
         await welcome_channel.send(embed=embed)
 
 
-# UPDATE MEMBER COUNT
-def update_member_count():
-    data = load_data()
-    data['member_count'] = data.get('member_count', 0) + 1
-    save_data(data)
-
-
-# REMOVE ALL CHANNELS FROM SERVER STATS CATEGORY
-async def remove_all_from_server_stats():
-    category = client.get_channel(int(SERVER_STATS_CATEGORY_ID))
-    for channel in category.channels:
-        await channel.delete(reason="Removing all channels in the category.")
-
-
-# CREATE LOCKED CHANNEL
-async def create_locked_channel(channel_name: str):
-    category = client.get_channel(int(SERVER_STATS_CATEGORY_ID))
-    guild = client.get_guild(int(GUILD_ID))
-    await guild.create_text_channel(channel_name, category=category)
-
-
 # CREATE SERVER STATS
 async def create_server_stats():
     data = load_data()
-    await remove_all_from_server_stats()
-    await create_locked_channel(f"MEMBERS: {data['member_count']}")
+    guild = client.get_guild(int(GUILD_ID))
+    category = await create_category(guild, 'SERVER STATS', 1)
+    await create_channel(guild, f"MEMBERS: {data['member_count']}", 'text', category)
+
+
+# CREATE CATEGORY
+async def create_category(guild, category_name: str, position: int):
+    new_category = await guild.create_category(name=category_name, position=position)
+    return new_category
+
+
+# CREATE CHANNEL
+async def create_channel(guild, channel_name: str, channel_type: str, category: discord.CategoryChannel = None):
+    if channel_type == 'text':
+        new_channel = await guild.create_text_channel(name=channel_name, category=category)
+    elif channel_type == 'voice':
+        new_channel = await guild.create_voice_channel(name=channel_name, category=category)
+    else:
+        raise ValueError("Channel type must be 'text' or 'voice'")
+    return new_channel
