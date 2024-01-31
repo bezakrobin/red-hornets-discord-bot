@@ -3,7 +3,7 @@ from discord import app_commands
 import os
 from flask import Flask
 from threading import Thread
-from utils.utils import send_welcome_message, create_server_stats
+from utils import create_server_stats, send_welcome_message
 
 
 # FLASK WEB SERVER
