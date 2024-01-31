@@ -1,12 +1,24 @@
 import discord
 import os
+import requests
+import time
 from flask import Flask
 from threading import Thread
-from functions.welcome_message import welcome_message
-from functions.server_stats import server_stats
+from utils.get_member_count import get_member_count
+from utils.set_channel_name_by_id import set_channel_name_by_id
 
 
-# FLASK WEB SERVER
+def keep_alive_ping():
+    while True:
+        try:
+            response = requests.get('https://red-hornets-discord-bot.onrender.com')
+            if response.status_code == 200:
+                print("Bot is alive")
+        except Exception as e:
+            print(f"Error: {e}")
+        time.sleep(60)
+
+
 app = Flask(__name__)
 
 
@@ -20,44 +32,53 @@ def run():
 
 
 def keep_alive():
-    t = Thread(target=run)
-    t.start()
+    t1 = Thread(target=run)
+    t2 = Thread(target=keep_alive_ping)
+    t1.start()
+    t2.start()
 
 
-# ENV VARIABLES
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-GUILD_ID = os.environ.get('GUILD_ID')
-WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
+bot_token = os.environ.get('BOT_TOKEN')
+guild_id = os.environ.get('GUILD_ID')
+channel_member_count = os.environ.get('MEMBER_COUNT_ID')
+welcome_channel_id = os.environ.get('WELCOME_CHANNEL_ID')
 
 
-# BOT SETUP
 intents = discord.Intents.default()
 intents.members = True
 intents.messages = True
 client = discord.Client(intents=intents)
 
 
-# ON READY EVENT
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}.')
-    await server_stats(client, GUILD_ID)
+    guild = client.get_guild(int(guild_id))
+    await set_channel_name_by_id(guild, int(channel_member_count), f"MEMBERS: {await get_member_count(guild)}")
 
 
-# ON MEMBER JOIN EVENT
 @client.event
 async def on_member_join(member):
-    print(f'{member} has joined the server.')
-    await welcome_message(client, member, WELCOME_CHANNEL_ID)
-    await server_stats(client, GUILD_ID)
+    print(f'{member.name} has joined the server.')
+    welcome_channel = client.get_channel(int(welcome_channel_id))
+    if welcome_channel:
+        embed = discord.Embed(
+            title=f"Welcome {member.name}!",
+            description=f"Thanks for joining {member.guild.name}! We're glad to have you here.",
+            color=discord.Color.red()
+        )
+        embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+        await welcome_channel.send(embed=embed)
+    guild = client.get_guild(int(guild_id))
+    await set_channel_name_by_id(guild, int(channel_member_count), f"MEMBERS: {await get_member_count(guild)}")
 
 
-# ON MEMBER REMOVE EVENT
 @client.event
 async def on_member_remove(member):
-    print(f'{member} has left the server.')
-    await server_stats(client, GUILD_ID)
+    print(f'{member.name} has left the server.')
+    guild = client.get_guild(int(guild_id))
+    await set_channel_name_by_id(guild, int(channel_member_count), f"MEMBERS: {await get_member_count(guild)}")
 
-# FLASK & BOT START
+
 keep_alive()
-client.run(BOT_TOKEN)
+client.run(bot_token)
