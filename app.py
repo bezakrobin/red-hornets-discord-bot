@@ -37,21 +37,10 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-# SLASH COMMANDS
-@tree.command(
-    name="commandname",
-    description="My first application Command",
-    guild=discord.Object(id=int(GUILD_ID))
-)
-async def first_command(interaction):
-    await interaction.response.send_message("Hello!")
-
-
 # ON READY EVENT
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
-    await create_server_stats(client, GUILD_ID)
 
 
 # ON MEMBER JOIN EVENT
