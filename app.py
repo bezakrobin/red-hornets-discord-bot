@@ -58,6 +58,7 @@ async def first_command(interaction):
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
+    load_server_stats()
     print("Ready!")
 
 
@@ -100,3 +101,16 @@ def update_member_count():
     data = load_data()
     data['member_count'] = data.get('member_count', 0) + 1
     save_data(data)
+
+
+# REMOVE ALL CHANNELS FROM SERVER STATS CATEGORY
+async def remove_all_from_server_stats():
+    category = client.get_channel(int(SERVER_STATS_CATEGORY_ID))
+    for channel in category.channels:
+        await channel.delete(reason="Removing all channels in the category.")
+
+
+# LOAD SERVER STATS
+def load_server_stats():
+    data = load_data()
+
