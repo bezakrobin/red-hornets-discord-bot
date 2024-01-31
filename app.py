@@ -47,8 +47,7 @@ async def my_schedule():
 # ON READY EVENT
 @client.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
-    await create_server_stats(GUILD_ID, client)
+    print('Ready!')
 
 
 # ON MEMBER JOIN EVENT
@@ -61,5 +60,5 @@ async def on_member_join(member):
 keep_alive()
 client.run(BOT_TOKEN)
 scheduler = BackgroundScheduler()
-scheduler.add_job(my_schedule(), 'interval', minutes=5)
+scheduler.add_job(my_schedule(), 'interval', minutes=1)
 scheduler.start()
