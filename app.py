@@ -60,5 +60,5 @@ async def on_member_join(member):
 keep_alive()
 client.run(BOT_TOKEN)
 scheduler = BackgroundScheduler()
-scheduler.add_job(my_schedule(), 'interval', minutes=5)
+scheduler.add_job(my_schedule(), 'interval', minutes=1)
 scheduler.start()
