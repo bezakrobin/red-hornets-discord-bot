@@ -3,9 +3,8 @@ from discord import app_commands
 import os
 from flask import Flask
 from threading import Thread
-from functions.send_welcome_message import send_welcome_message
-from functions.create_server_stats import create_server_stats
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from functions.welcome_message import welcome_message
+from functions.server_stats import server_stats
 
 
 # FLASK WEB SERVER
@@ -39,25 +38,17 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-# REPEAT ON SCHEDULE
-async def my_schedule():
-    await create_server_stats(GUILD_ID, client)
-
-
 # ON READY EVENT
 @client.event
 async def on_ready():
-    print('Ready!')
-
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(my_schedule, 'interval', minutes=1)
-    scheduler.start()
+    print(f'We have logged in as {client.user}')
+    await server_stats(client, GUILD_ID)
 
 
 # ON MEMBER JOIN EVENT
 @client.event
 async def on_member_join(member):
-    await send_welcome_message(member, client, WELCOME_CHANNEL_ID)
+    await welcome_message(client, member, WELCOME_CHANNEL_ID)
 
 
 # FLASK & BOT START
