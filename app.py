@@ -5,6 +5,7 @@ from flask import Flask
 from threading import Thread
 from functions.send_welcome_message import send_welcome_message
 from functions.create_server_stats import create_server_stats
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 # FLASK WEB SERVER
@@ -38,6 +39,11 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
+# REPEAT ON SCHEDULE
+async def my_schedule():
+    await create_server_stats(GUILD_ID, client)
+
+
 # ON READY EVENT
 @client.event
 async def on_ready():
@@ -54,3 +60,6 @@ async def on_member_join(member):
 # FLASK & BOT START
 keep_alive()
 client.run(BOT_TOKEN)
+scheduler = BackgroundScheduler()
+scheduler.add_job(my_schedule(), 'interval', minutes=5)
+scheduler.start()
