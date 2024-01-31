@@ -1,9 +1,22 @@
 import discord
 import os
+import requests
+import time
 from flask import Flask
 from threading import Thread
 from utils.get_member_count import get_member_count
 from utils.set_channel_name_by_id import set_channel_name_by_id
+
+
+def keep_alive_ping():
+    while True:
+        try:
+            response = requests.get('https://red-hornets-discord-bot.onrender.com')
+            if response.status_code == 200:
+                print("Bot is alive")
+        except Exception as e:
+            print(f"Error: {e}")
+        time.sleep(60)
 
 
 app = Flask(__name__)
@@ -19,8 +32,10 @@ def run():
 
 
 def keep_alive():
-    t = Thread(target=run)
-    t.start()
+    t1 = Thread(target=run)
+    t2 = Thread(target=keep_alive_ping)
+    t1.start()
+    t2.start()
 
 
 bot_token = os.environ.get('BOT_TOKEN')
