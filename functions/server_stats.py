@@ -24,6 +24,12 @@ async def server_stats(client, guild_id):
     with open('data.json', 'w') as file:
         json.dump(data, file)
 
-    await guild.create_voice_channel(f"MEMBERS: {guild.member_count}", category=new_category)
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(connect=False)
+    }
+
+    await guild.create_voice_channel(f"MEMBERS: {guild.member_count}", category=new_category, overwrites=overwrites)
+    await guild.create_voice_channel(f"BUGS FIXED: {guild.member_count}", category=new_category, overwrites=overwrites)
+    await guild.create_voice_channel(f"BUGS REPORTED: {guild.member_count}", category=new_category, overwrites=overwrites)
 
     print(f'Updated server stats for {guild.name} server')
