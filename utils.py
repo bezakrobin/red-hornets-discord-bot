@@ -34,3 +34,33 @@ async def send_welcome_message(member, client, welcome_channel_id):
 async def count_members(client, guild_id):
     guild = client.get_guild(int(guild_id))
     return len(guild.members)
+
+
+# CREATE SERVER STATS
+async def create_server_stats(client, server_stats_category_id):
+    pass
+
+
+# CREATE LOCKED CHANNEL
+async def create_locked_channel(guild, channel_name: str, channel_type: str, category: discord.CategoryChannel = None):
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(send_messages=False, connect=False)
+    }
+    if channel_type == 'text':
+        new_channel = await guild.create_text_channel(name=channel_name, overwrites=overwrites, category=category)
+    elif channel_type == 'voice':
+        new_channel = await guild.create_voice_channel(name=channel_name, overwrites=overwrites, category=category)
+    else:
+        raise ValueError("Channel type must be 'text' or 'voice'")
+    return new_channel
+
+
+# CREATE CHANNEL
+async def create_channel(guild, channel_name: str, channel_type: str, category: discord.CategoryChannel = None):
+    if channel_type == 'text':
+        new_channel = await guild.create_text_channel(name=channel_name, category=category)
+    elif channel_type == 'voice':
+        new_channel = await guild.create_voice_channel(name=channel_name, category=category)
+    else:
+        raise ValueError("Channel type must be 'text' or 'voice'")
+    return new_channel

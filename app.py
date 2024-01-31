@@ -2,7 +2,6 @@ import discord
 from discord import app_commands
 import os
 from flask import Flask
-from threading import Thread
 from utils import create_server_stats, send_welcome_message
 
 
@@ -23,7 +22,7 @@ def run():
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
 WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
-
+SERVER_STATS_CATEGORY_ID = os.environ.get('SERVER_STATS_CATEGORY_ID')
 
 # BOT SETUP
 intents = discord.Intents.default()
@@ -36,6 +35,7 @@ tree = app_commands.CommandTree(client)
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
+    await create_server_stats(client, SERVER_STATS_CATEGORY_ID)
 
 
 # ON MEMBER JOIN EVENT
