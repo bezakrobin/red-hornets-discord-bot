@@ -122,4 +122,3 @@ def create_server_stats():
     data = load_data()
     remove_all_from_server_stats()
     create_locked_channel(f"MEMBERS: {data['member_count']}")
-
