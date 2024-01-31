@@ -23,7 +23,7 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-# EMBED WELCOME MESSAGE
+# ON MEMBER JOIN EVENT
 @client.event
 async def on_member_join(member):
     welcome_channel = client.get_channel(int(WELCOME_CHANNEL_ID))
@@ -37,6 +37,7 @@ async def on_member_join(member):
         await welcome_channel.send(embed=embed)
 
 
+# SLASH COMMANDS
 @tree.command(
     name="commandname",
     description="My first application Command",
@@ -46,6 +47,7 @@ async def first_command(interaction):
     await interaction.response.send_message("Hello!")
 
 
+# ON READY EVENT
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
