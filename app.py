@@ -19,11 +19,6 @@ def run():
     app.run(host='0.0.0.0', port=10000)
 
 
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-
-
 # ENV VARIABLES
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
@@ -50,5 +45,5 @@ async def on_member_join(member):
 
 
 # FLASK & BOT START
-keep_alive()
+run()
 client.run(BOT_TOKEN)

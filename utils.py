@@ -28,3 +28,9 @@ async def send_welcome_message(member, client, welcome_channel_id):
         )
         embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
         await welcome_channel.send(embed=embed)
+
+
+# COUNT MEMBERS
+async def count_members(client, guild_id):
+    guild = client.get_guild(int(guild_id))
+    return len(guild.members)
