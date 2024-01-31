@@ -1,5 +1,4 @@
 import discord
-from discord import app_commands
 import os
 from flask import Flask
 from threading import Thread
@@ -29,7 +28,6 @@ def keep_alive():
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
 WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
-BUG_REPORT_CHANNEL_ID = os.environ.get('BUG_REPORT_CHANNEL_ID')
 
 
 # BOT SETUP
@@ -37,21 +35,28 @@ intents = discord.Intents.default()
 intents.members = True
 intents.messages = True
 client = discord.Client(intents=intents)
-tree = app_commands.CommandTree(client)
 
 
 # ON READY EVENT
 @client.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
-    await server_stats(client, GUILD_ID, BUG_REPORT_CHANNEL_ID)
+    print(f'We have logged in as {client.user}.')
+    await server_stats(client, GUILD_ID)
 
 
 # ON MEMBER JOIN EVENT
 @client.event
 async def on_member_join(member):
+    print(f'{member} has joined the server.')
     await welcome_message(client, member, WELCOME_CHANNEL_ID)
+    await server_stats(client, GUILD_ID)
 
+
+# ON MEMBER REMOVE EVENT
+@client.event
+async def on_member_remove(member):
+    print(f'{member} has left the server.')
+    await server_stats(client, GUILD_ID)
 
 # FLASK & BOT START
 keep_alive()
