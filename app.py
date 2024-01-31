@@ -2,8 +2,8 @@ import discord
 import os
 from flask import Flask
 from threading import Thread
-from functions.welcome_message import welcome_message
-from functions.server_stats import server_stats
+from utils.init.init_data import init_data
+from utils.init.init_categories import init_categories
 
 
 # FLASK WEB SERVER
@@ -25,9 +25,8 @@ def keep_alive():
 
 
 # ENV VARIABLES
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-GUILD_ID = os.environ.get('GUILD_ID')
-WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
+bot_token = os.environ.get('BOT_TOKEN')
+guild_id = os.environ.get('GUILD_ID')
 
 
 # BOT SETUP
@@ -41,23 +40,11 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}.')
-    await server_stats(client, GUILD_ID)
+    guild = client.get_guild(int(guild_id))
+    await init_data()
+    await init_categories(guild)
 
-
-# ON MEMBER JOIN EVENT
-@client.event
-async def on_member_join(member):
-    print(f'{member} has joined the server.')
-    await welcome_message(client, member, WELCOME_CHANNEL_ID)
-    await server_stats(client, GUILD_ID)
-
-
-# ON MEMBER REMOVE EVENT
-@client.event
-async def on_member_remove(member):
-    print(f'{member} has left the server.')
-    await server_stats(client, GUILD_ID)
 
 # FLASK & BOT START
 keep_alive()
-client.run(BOT_TOKEN)
+client.run(bot_token)
