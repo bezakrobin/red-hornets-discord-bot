@@ -3,6 +3,9 @@ from discord import app_commands
 import os
 from flask import Flask
 from functions.send_welcome_message import send_welcome_message
+from functions.create_category import create_category
+from functions.create_locked_channel import create_locked_channel
+from functions.load_data import load_data
 
 
 # FLASK WEB SERVER
@@ -29,6 +32,23 @@ intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
+
+
+# COMMANDS
+@tree.command(
+    name="serverstats",
+    description="This command will create a server status category with status data.",
+    guild=discord.Object(id=int(GUILD_ID))
+)
+async def serverstats():
+    data = load_data()
+    guild = client.get_guild(int(GUILD_ID))
+    category = await create_category(guild, '📊 SERVER STATS 📊', 0)
+    await create_locked_channel(guild, f"MEMBERS: {data['member_count']}", 'voice', category)
+    await create_locked_channel(guild, f"SUGGESTIONS: {data['suggestions_count']}", 'voice', category)
+    await create_locked_channel(guild, f"SUGGESTIONS DONE: {data['suggestions_done_count']}", 'voice', category)
+    await create_locked_channel(guild, f"BUGS: {data['bugs_count']}", 'voice', category)
+    await create_locked_channel(guild, f"BUGS FIXED: {data['bugs_fixed_count']}", 'voice', category)
 
 
 # ON READY EVENT

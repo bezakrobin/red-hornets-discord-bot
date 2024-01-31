@@ -1,3 +1,7 @@
 {
-  "member_count": 0
+  "member_count": 0,
+  "suggestions_count": 0,
+  "suggestions_done_count": 0,
+  "bugs_count": 0,
+  "bugs_fixed_count": 0
 }
