@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 import os
 from flask import Flask
+from threading import Thread
 from functions.send_welcome_message import send_welcome_message
 from functions.create_category import create_category
 from functions.create_locked_channel import create_locked_channel
@@ -21,6 +22,11 @@ def home():
 
 def run():
     app.run(host='0.0.0.0', port=10000)
+
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
 
 
 # ENV VARIABLES
@@ -70,5 +76,5 @@ async def on_member_join(member):
 
 
 # FLASK & BOT START
-run()
+keep_alive()
 client.run(BOT_TOKEN)
