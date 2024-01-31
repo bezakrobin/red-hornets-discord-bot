@@ -59,7 +59,6 @@ async def first_command(interaction):
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
     create_server_stats()
-    print("Ready!")
 
 
 # FLASK & BOT START
