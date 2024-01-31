@@ -1,8 +1,8 @@
-from load_data import load_data
-from delete_category_and_channels import delete_category_and_channels
-from create_locked_channel import create_locked_channel
-from create_category import create_category
-from save_data import save_data
+from functions.load_data import load_data
+from functions.delete_category_and_channels import delete_category_and_channels
+from functions.create_locked_channel import create_locked_channel
+from functions.create_category import create_category
+from functions.save_data import save_data
 
 
 async def create_server_stats(guild_id, client):
