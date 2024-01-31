@@ -41,7 +41,8 @@ tree = app_commands.CommandTree(client)
 # ON MEMBER JOIN EVENT
 @client.event
 async def on_member_join(member):
-    send_welcome_message(member)
+    await send_welcome_message(member)
+    update_member_count()
 
 
 # SLASH COMMANDS
@@ -58,7 +59,7 @@ async def first_command(interaction):
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
-    create_server_stats()
+    await create_server_stats()
 
 
 # FLASK & BOT START
@@ -117,7 +118,7 @@ async def create_locked_channel(channel_name: str):
 
 
 # CREATE SERVER STATS
-def create_server_stats():
+async def create_server_stats():
     data = load_data()
-    remove_all_from_server_stats()
-    create_locked_channel(f"MEMBERS: {data['member_count']}")
+    await remove_all_from_server_stats()
+    await create_locked_channel(f"MEMBERS: {data['member_count']}")
