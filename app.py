@@ -2,13 +2,24 @@ import discord
 from discord import app_commands
 import os
 from flask import Flask
+from threading import Thread
 
+# FLASK WEB SERVER
 app = Flask(__name__)
 
 
 @app.route('/')
 def home():
     return "I'm alive!"
+
+
+def run():
+    app.run(host='0.0.0.0', port=10000)
+
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
 
 
 # ENV VARIABLES
@@ -54,4 +65,5 @@ async def on_ready():
     print("Ready!")
 
 
+keep_alive()
 client.run(BOT_TOKEN)
