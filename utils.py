@@ -30,18 +30,29 @@ async def send_welcome_message(member, client, welcome_channel_id):
         await welcome_channel.send(embed=embed)
 
 
-# CREATE SERVER STATS
-async def create_server_stats(client, guild_id):
-    data = load_data()
+# COUNT MEMBERS
+async def count_members(client, guild_id):
     guild = client.get_guild(int(guild_id))
-    category = await create_category(guild, '📊 SERVER STATS 📊', 0)
-    await create_locked_channel(guild, f"MEMBERS: {data['member_count']}", 'voice', category)
+    return len(guild.members)
 
 
-# CREATE CATEGORY
-async def create_category(guild, category_name: str, position: int):
-    new_category = await guild.create_category(name=category_name, position=position)
-    return new_category
+# CREATE SERVER STATS
+async def create_server_stats(client, server_stats_category_id):
+    pass
+
+
+# CREATE LOCKED CHANNEL
+async def create_locked_channel(guild, channel_name: str, channel_type: str, category: discord.CategoryChannel = None):
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(send_messages=False, connect=False)
+    }
+    if channel_type == 'text':
+        new_channel = await guild.create_text_channel(name=channel_name, overwrites=overwrites, category=category)
+    elif channel_type == 'voice':
+        new_channel = await guild.create_voice_channel(name=channel_name, overwrites=overwrites, category=category)
+    else:
+        raise ValueError("Channel type must be 'text' or 'voice'")
+    return new_channel
 
 
 # CREATE CHANNEL
@@ -50,20 +61,6 @@ async def create_channel(guild, channel_name: str, channel_type: str, category: 
         new_channel = await guild.create_text_channel(name=channel_name, category=category)
     elif channel_type == 'voice':
         new_channel = await guild.create_voice_channel(name=channel_name, category=category)
-    else:
-        raise ValueError("Channel type must be 'text' or 'voice'")
-    return new_channel
-
-
-# CREATE LOCKED CHANNEL
-async def create_locked_channel(guild, channel_name: str, channel_type: str,  category: discord.CategoryChannel = None):
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(send_messages=False, connect=False)
-    }
-    if channel_type == 'text':
-        new_channel = await guild.create_text_channel(name=channel_name, overwrites=overwrites, category=category)
-    elif channel_type == 'voice':
-        new_channel = await guild.create_voice_channel(name=channel_name, overwrites=overwrites, category=category)
     else:
         raise ValueError("Channel type must be 'text' or 'voice'")
     return new_channel
