@@ -3,7 +3,7 @@ from discord import app_commands
 import os
 from flask import Flask
 from threading import Thread
-import json
+from utils import create_server_stats, send_welcome_message
 
 
 # FLASK WEB SERVER
@@ -37,80 +37,6 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-# FUNCTIONS
-# LOAD JSON DATA
-def load_data(file_name='data.json'):
-    try:
-        with open(file_name, 'r') as file:
-            return json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-
-
-# SAVE JSON DATA
-def save_data(data, file_name='data.json'):
-    with open(file_name, 'w') as file:
-        json.dump(data, file, indent=4)
-
-
-# SEND WELCOME MESSAGE
-async def send_welcome_message(member):
-    welcome_channel = client.get_channel(int(WELCOME_CHANNEL_ID))
-    if welcome_channel:
-        embed = discord.Embed(
-            title=f"Welcome @{member.name}!",
-            description=f"Thanks for joining {member.guild.name}! We're glad to have you here.",
-            color=discord.Color.red()
-        )
-        embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
-        await welcome_channel.send(embed=embed)
-
-
-# CREATE SERVER STATS
-async def create_server_stats():
-    data = load_data()
-    guild = client.get_guild(int(GUILD_ID))
-    category = await create_category(guild, '📊 SERVER STATS 📊', 0)
-    await create_locked_channel(guild, f"MEMBERS: {data['member_count']}", 'voice', category)
-
-
-# CREATE CATEGORY
-async def create_category(guild, category_name: str, position: int):
-    new_category = await guild.create_category(name=category_name, position=position)
-    return new_category
-
-
-# CREATE CHANNEL
-async def create_channel(guild, channel_name: str, channel_type: str, category: discord.CategoryChannel = None):
-    if channel_type == 'text':
-        new_channel = await guild.create_text_channel(name=channel_name, category=category)
-    elif channel_type == 'voice':
-        new_channel = await guild.create_voice_channel(name=channel_name, category=category)
-    else:
-        raise ValueError("Channel type must be 'text' or 'voice'")
-    return new_channel
-
-
-# CREATE LOCKED CHANNEL
-async def create_locked_channel(guild, channel_name: str, channel_type: str,  category: discord.CategoryChannel = None):
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(send_messages=False, connect=False)
-    }
-    if channel_type == 'text':
-        new_channel = await guild.create_text_channel(name=channel_name, overwrites=overwrites, category=category)
-    elif channel_type == 'voice':
-        new_channel = await guild.create_voice_channel(name=channel_name, overwrites=overwrites, category=category)
-    else:
-        raise ValueError("Channel type must be 'text' or 'voice'")
-    return new_channel
-
-
-# ON MEMBER JOIN EVENT
-@client.event
-async def on_member_join(member):
-    await send_welcome_message(member)
-
-
 # SLASH COMMANDS
 @tree.command(
     name="commandname",
@@ -125,7 +51,13 @@ async def first_command(interaction):
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
-    await create_server_stats()
+    await create_server_stats(client, GUILD_ID)
+
+
+# ON MEMBER JOIN EVENT
+@client.event
+async def on_member_join(member):
+    await send_welcome_message(member, client, WELCOME_CHANNEL_ID)
 
 
 # FLASK & BOT START
