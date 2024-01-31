@@ -70,8 +70,8 @@ async def send_welcome_message(member):
 async def create_server_stats():
     data = load_data()
     guild = client.get_guild(int(GUILD_ID))
-    category = await create_category(guild, '📊 SERVER STATS 📊', 1)
-    await create_channel(guild, f"MEMBERS: {data['member_count']}", 'voice', category)
+    category = await create_category(guild, '📊 SERVER STATS 📊', 0)
+    await create_locked_channel(guild, f"MEMBERS: {data['member_count']}", 'voice', category)
 
 
 # CREATE CATEGORY
