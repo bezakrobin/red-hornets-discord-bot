@@ -48,11 +48,12 @@ tree = app_commands.CommandTree(client)
     description="This command will create a server status category with status data.",
     guild=discord.Object(id=int(GUILD_ID))
 )
-async def serverstats():
+async def serverstats(interaction):
     data = load_data()
-    category_to_delete = client.get_channel(int(data['service_stats_category']))
-    await delete_category_and_channels(category_to_delete)
-    guild = client.get_guild(int(GUILD_ID))
+    category_to_delete = interaction.client.get_channel(int(data['service_stats_category']))
+    if category_to_delete:
+        await delete_category_and_channels(category_to_delete)
+    guild = interaction.client.get_guild(int(GUILD_ID))
     category = await create_category(guild, '📊 SERVER STATS 📊', 0)
     data['server_stats_category'] = category.id
     save_data(data)
