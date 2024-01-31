@@ -1,7 +1,7 @@
 import discord
 
 
-async def send_welcome_message(member, client, welcome_channel_id):
+async def welcome_message(client, member, welcome_channel_id):
     welcome_channel = client.get_channel(int(welcome_channel_id))
     if welcome_channel:
         embed = discord.Embed(
