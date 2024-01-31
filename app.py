@@ -29,11 +29,13 @@ def keep_alive():
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
 WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
+BUG_REPORT_CHANNEL_ID = os.environ.get('BUG_REPORT_CHANNEL_ID')
 
 
 # BOT SETUP
 intents = discord.Intents.default()
 intents.members = True
+intents.messages = True
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
@@ -42,7 +44,7 @@ tree = app_commands.CommandTree(client)
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
-    await server_stats(client, GUILD_ID)
+    await server_stats(client, GUILD_ID, BUG_REPORT_CHANNEL_ID)
 
 
 # ON MEMBER JOIN EVENT

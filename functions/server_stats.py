@@ -2,7 +2,7 @@ import discord
 import json
 
 
-async def server_stats(client, guild_id):
+async def server_stats(client, guild_id, bug_report_channel_id):
     with open('data.json', 'r') as file:
         data = json.load(file)
 
@@ -28,8 +28,16 @@ async def server_stats(client, guild_id):
         guild.default_role: discord.PermissionOverwrite(connect=False)
     }
 
+    channel = client.get_channel(bug_report_channel_id)
+
+    bugs_reported_message_count = 0
+
+    async for _ in channel.history(limit=None):
+        bugs_reported_message_count += 1
+
+    # TODO BUGS FIXED
     await guild.create_voice_channel(f"MEMBERS: {guild.member_count}", category=new_category, overwrites=overwrites)
-    await guild.create_voice_channel(f"BUGS FIXED: {guild.member_count}", category=new_category, overwrites=overwrites)
-    await guild.create_voice_channel(f"BUGS REPORTED: {guild.member_count}", category=new_category, overwrites=overwrites)
+    # await guild.create_voice_channel(f"BUGS FIXED: 0", category=new_category, overwrites=overwrites)
+    await guild.create_voice_channel(f"BUGS REPORTED: {bugs_reported_message_count}", category=new_category, overwrites=overwrites)
 
     print(f'Updated server stats for {guild.name} server')
