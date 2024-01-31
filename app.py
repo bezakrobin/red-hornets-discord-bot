@@ -1,5 +1,4 @@
 import discord
-from discord import app_commands
 import os
 from flask import Flask
 from threading import Thread
@@ -29,7 +28,6 @@ def keep_alive():
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 GUILD_ID = os.environ.get('GUILD_ID')
 WELCOME_CHANNEL_ID = os.environ.get('WELCOME_CHANNEL_ID')
-BUG_REPORT_CHANNEL_ID = os.environ.get('BUG_REPORT_CHANNEL_ID')
 
 
 # BOT SETUP
@@ -37,7 +35,6 @@ intents = discord.Intents.default()
 intents.members = True
 intents.messages = True
 client = discord.Client(intents=intents)
-tree = app_commands.CommandTree(client)
 
 
 # ON READY EVENT
