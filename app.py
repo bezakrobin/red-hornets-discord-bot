@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 import os
 from flask import Flask
-from utils import create_server_stats, send_welcome_message
+from functions.send_welcome_message import send_welcome_message
 
 
 # FLASK WEB SERVER
