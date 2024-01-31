@@ -37,34 +37,6 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-# ON MEMBER JOIN EVENT
-@client.event
-async def on_member_join(member):
-    await send_welcome_message(member)
-
-
-# SLASH COMMANDS
-@tree.command(
-    name="commandname",
-    description="My first application Command",
-    guild=discord.Object(id=int(GUILD_ID))
-)
-async def first_command(interaction):
-    await interaction.response.send_message("Hello!")
-
-
-# ON READY EVENT
-@client.event
-async def on_ready():
-    await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
-    await create_server_stats()
-
-
-# FLASK & BOT START
-keep_alive()
-client.run(BOT_TOKEN)
-
-
 # FUNCTIONS
 # LOAD JSON DATA
 def load_data(file_name='data.json'):
@@ -117,3 +89,31 @@ async def create_channel(guild, channel_name: str, channel_type: str, category: 
     else:
         raise ValueError("Channel type must be 'text' or 'voice'")
     return new_channel
+
+
+# ON MEMBER JOIN EVENT
+@client.event
+async def on_member_join(member):
+    await send_welcome_message(member)
+
+
+# SLASH COMMANDS
+@tree.command(
+    name="commandname",
+    description="My first application Command",
+    guild=discord.Object(id=int(GUILD_ID))
+)
+async def first_command(interaction):
+    await interaction.response.send_message("Hello!")
+
+
+# ON READY EVENT
+@client.event
+async def on_ready():
+    await tree.sync(guild=discord.Object(id=int(GUILD_ID)))
+    await create_server_stats()
+
+
+# FLASK & BOT START
+keep_alive()
+client.run(BOT_TOKEN)
