@@ -5,7 +5,7 @@ from flask import Flask
 from threading import Thread
 from functions.send_welcome_message import send_welcome_message
 from functions.create_server_stats import create_server_stats
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 # FLASK WEB SERVER
@@ -49,6 +49,10 @@ async def my_schedule():
 async def on_ready():
     print('Ready!')
 
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(my_schedule, 'interval', minutes=1)
+    scheduler.start()
+
 
 # ON MEMBER JOIN EVENT
 @client.event
@@ -59,6 +63,3 @@ async def on_member_join(member):
 # FLASK & BOT START
 keep_alive()
 client.run(BOT_TOKEN)
-scheduler = BackgroundScheduler()
-scheduler.add_job(my_schedule(), 'interval', minutes=1)
-scheduler.start()
